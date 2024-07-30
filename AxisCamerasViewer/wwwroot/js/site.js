@@ -4,6 +4,7 @@
         let cameraId = await createCamera(url);
         
         renderCamera(cameraId, url);
+        connectToCameraHub();
     }
 }
 
@@ -32,6 +33,19 @@ function renderCamera(cameraId, url) {
     streamContainer.id = `container-${cameraId}`;
 
     document.getElementById('streams').appendChild(streamContainer);
+}
+
+function connectToCameraHub() {
+    var connection = new signalR.HubConnectionBuilder()
+        .withUrl("/cameraHub")
+        .build();
+
+    connection.on('SendImage', (cameraId, image) => {
+        let img = document.getElementById(cameraId);
+        img.src = `data:image/jpeg;base64,${image}`;
+    });
+
+    connection.start().catch(err => console.error(err.toString()));
 }
 
 async function createCamera(url) {

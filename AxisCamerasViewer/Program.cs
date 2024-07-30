@@ -1,10 +1,12 @@
 using AxisCamerasViewer;
+using AxisCamerasViewer.Cameras.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddHttpClient();
 builder.Services.AddControllersWithViews();
+builder.Services.AddSignalR();
 builder.Services.AddSingleton<ICameraService, CameraService>();
 
 var app = builder.Build();
@@ -19,6 +21,11 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<CameraHub>("/cameraHub");
+});
 
 app.MapControllerRoute(
     name: "default",

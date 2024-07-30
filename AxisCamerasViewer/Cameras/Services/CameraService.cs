@@ -1,5 +1,7 @@
 ﻿using System.Collections.Concurrent;
+using AxisCamerasViewer.Cameras.Hubs;
 using AxisCamerasViewer.Models;
+using Microsoft.AspNetCore.SignalR;
 
 namespace AxisCamerasViewer;
 
@@ -14,10 +16,12 @@ public class CameraService : ICameraService
 {
     private readonly ConcurrentDictionary<Guid, Camera> _cameras = new ();
     private readonly HttpClient _httpClient;
+    private readonly IHubContext<CameraHub> _hubContext;
 
-    public CameraService(HttpClient httpClient)
+    public CameraService(HttpClient httpClient, IHubContext<CameraHub> hubContext)
     {
         _httpClient = httpClient;
+        _hubContext = hubContext;
     }
     
     public Guid CreateCamera(string url)
@@ -25,7 +29,7 @@ public class CameraService : ICameraService
         ArgumentException.ThrowIfNullOrWhiteSpace(url);
         
         var id = Guid.NewGuid();
-        var camera = new Camera(_httpClient, url);
+        var camera = new Camera(_httpClient, _hubContext, id, url);
         
         _cameras.TryAdd(id, camera);
         

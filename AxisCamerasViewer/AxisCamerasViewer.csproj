@@ -63,7 +63,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Chats\" />
+      <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="9.0.0-preview.6.24328.4" />
     </ItemGroup>
 
 </Project>

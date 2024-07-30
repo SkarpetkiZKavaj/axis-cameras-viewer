@@ -1,5 +1,7 @@
 ﻿using System.Collections.Concurrent;
+using AxisCamerasViewer.Cameras.Hubs;
 using AxisCamerasViewer.Models;
+using Microsoft.AspNetCore.SignalR;
 using NSubstitute;
 using Xunit;
 
@@ -8,6 +10,7 @@ namespace AxisCamerasViewer.Tests;
 public class CameraServiceTests
 {
     private readonly HttpClient _httpClient;
+    private readonly IHubContext<CameraHub> _hubContext;
     private readonly CameraService _cameraService;
 
     private const string CameraUrl = "http://63.142.183.154:6103/mjpg/video.mjpg";
@@ -15,7 +18,8 @@ public class CameraServiceTests
     public CameraServiceTests()
     {
         _httpClient = Substitute.For<HttpClient>();
-        _cameraService = new CameraService(_httpClient);
+        _hubContext = Substitute.For<IHubContext<CameraHub>>();
+        _cameraService = new CameraService(_httpClient, _hubContext);
     }
     
     [Theory]

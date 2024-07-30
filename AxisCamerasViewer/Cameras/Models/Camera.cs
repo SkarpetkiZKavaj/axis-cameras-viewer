@@ -1,18 +1,26 @@
-﻿namespace AxisCamerasViewer.Models;
+﻿using AxisCamerasViewer.Cameras.Helpers;
+using AxisCamerasViewer.Cameras.Hubs;
+using Microsoft.AspNetCore.SignalR;
+
+namespace AxisCamerasViewer.Models;
 
 public class Camera
 {
-    private readonly string _url;
     private readonly CancellationTokenSource _cancellationTokenSource;
     private readonly HttpClient _httpClient;
+    private readonly IHubContext<CameraHub> _hubContext;
+    private readonly Guid _id;
+    private readonly string _url;
+    
     private HttpContent _content;
 
-    public Camera(HttpClient client, string url)
+    public Camera(HttpClient client, IHubContext<CameraHub> hubContext, Guid id, string url)
     {
-        _url = url;
-        
-        _httpClient = client;
         _cancellationTokenSource = new CancellationTokenSource();
+        _httpClient = client;
+        _hubContext = hubContext;
+        _id = id;
+        _url = url;
     }
 
     public async Task<HttpContent> FetchContent()
@@ -28,7 +36,7 @@ public class Camera
         return _content;
     }
 
-    public async Task StartWatching(Stream receiver)
+    public async Task StartWatching()
     {
         if (_content == null)
         {
@@ -39,7 +47,10 @@ public class Camera
         {
             await using (var responseStream = await _content.ReadAsStreamAsync(_cancellationTokenSource.Token))
             {
-                await responseStream.CopyToAsync(receiver, _cancellationTokenSource.Token);
+                await MjpegHelper.ProcessMjpegStreamAsync(responseStream, onImage: image =>
+                {
+                    _hubContext.Clients.All.SendAsync("SendImage", _id, image);
+                }, _cancellationTokenSource.Token);
             }
         }
         catch (OperationCanceledException ex)

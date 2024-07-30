@@ -25,11 +25,9 @@ public class ViewerController : Controller
     public async Task GetCamera(Guid id)
     {
         var camera = _cameraService.GetCamera(id);
-        var cameraContent = await camera.FetchContent();
         
-        Response.Headers.Append("Content-Type", cameraContent.Headers.ContentType?.ToString());
-        
-        await camera.StartWatching(Response.Body);
+        await camera.FetchContent();
+        await camera.StartWatching();
     }
 
     [HttpDelete("camera/{id}")]
