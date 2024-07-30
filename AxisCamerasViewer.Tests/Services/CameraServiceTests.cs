@@ -9,17 +9,17 @@ namespace AxisCamerasViewer.Tests;
 
 public class CameraServiceTests
 {
-    private readonly HttpClient _httpClient;
-    private readonly IHubContext<CameraHub> _hubContext;
     private readonly CameraService _cameraService;
 
     private const string CameraUrl = "http://63.142.183.154:6103/mjpg/video.mjpg";
     
     public CameraServiceTests()
     {
-        _httpClient = Substitute.For<HttpClient>();
-        _hubContext = Substitute.For<IHubContext<CameraHub>>();
-        _cameraService = new CameraService(_httpClient, _hubContext);
+        var httpClient = Substitute.For<HttpClient>();
+        var hubContext = Substitute.For<IHubContext<CameraHub>>();
+        var videoService = Substitute.For<IMjpegVideoService>();
+        
+        _cameraService = new CameraService(httpClient, hubContext, videoService);
     }
     
     [Theory]

@@ -17,11 +17,15 @@ public class CameraService : ICameraService
     private readonly ConcurrentDictionary<Guid, Camera> _cameras = new ();
     private readonly HttpClient _httpClient;
     private readonly IHubContext<CameraHub> _hubContext;
+    private readonly IMjpegVideoService _videoService;
 
-    public CameraService(HttpClient httpClient, IHubContext<CameraHub> hubContext)
+    public CameraService(HttpClient httpClient, 
+                         IHubContext<CameraHub> hubContext,
+                         IMjpegVideoService videoService)
     {
         _httpClient = httpClient;
         _hubContext = hubContext;
+        _videoService = videoService;
     }
     
     public Guid CreateCamera(string url)
@@ -29,7 +33,7 @@ public class CameraService : ICameraService
         ArgumentException.ThrowIfNullOrWhiteSpace(url);
         
         var id = Guid.NewGuid();
-        var camera = new Camera(_httpClient, _hubContext, id, url);
+        var camera = new Camera(_httpClient, _hubContext, _videoService, id, url);
         
         _cameras.TryAdd(id, camera);
         

@@ -1,13 +1,18 @@
-﻿namespace AxisCamerasViewer.Cameras.Helpers;
+﻿namespace AxisCamerasViewer;
 
-public static class MjpegHelper
+public interface IMjpegVideoService
+{
+    public Task ProcessMjpegVideoAsync(Stream stream, Action<byte[]> onImage, CancellationToken cancellationToken);
+}
+
+public class MjpegVideoService : IMjpegVideoService
 {
     private const int FillByte = 0xFF,
-                     SoiByte = 0xD8,
-                     EoiByte = 0xD9,
-                     ChunkSize = 4096;
+                      SoiByte = 0xD8,
+                      EoiByte = 0xD9,
+                      ChunkSize = 4096;
     
-    public static async Task ProcessMjpegStreamAsync(Stream stream, Action<byte[]> onImage, CancellationToken cancellationToken)
+    public async Task ProcessMjpegVideoAsync(Stream stream, Action<byte[]> onImage, CancellationToken cancellationToken)
     {
         using (var imageStream = new MemoryStream())
         {

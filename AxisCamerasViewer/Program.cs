@@ -8,6 +8,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<ICameraService, CameraService>();
+builder.Services.AddSingleton<IMjpegVideoService, MjpegVideoService>();
 
 var app = builder.Build();
 
